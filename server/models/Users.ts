@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
-import mongoose, { Schema, model , models } from 'mongoose';
+import mongoose from 'mongoose';
+const { Schema, model, models } = mongoose;
 
 export interface User {
   name: string
