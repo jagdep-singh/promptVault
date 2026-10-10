@@ -32,7 +32,7 @@ const promptSchema = new Schema(
             type: [String],
             default: []
         }, 
-        tools:{
+        tool:{
             type: String, 
             enum: TOOLS,
             default: "other"
