@@ -5,7 +5,7 @@ export async function createUser(userData: { name: string; email: string; passwo
 }
 
 export async function findUserByEmail(email: string) {
-    return await Users.findOne({ email }).select('password')
+    return await Users.findOne({ email }).select('+password')
 }
 
 export async function findUserById(id: string) {
