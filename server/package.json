@@ -9,7 +9,6 @@
   "scripts": {
     "dev": "nodemon --watch . --ext ts --exec tsx server.ts",
     "build": "tsc",
-    "prestart": "npm run build",
     "start": "node dist/server.js",
     "seed": "tsx scripts/seed.ts",
     "sync-indexes": "tsx scripts/sync-indexes.ts",
@@ -28,7 +27,6 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
