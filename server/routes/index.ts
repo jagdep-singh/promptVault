@@ -1,7 +1,7 @@
 import { Router } from "express"
 
 import healthRoutes from "./healthRoutes.js"
-import userRoutes from "./userRoutes.js"
+import userRoutes from "./authRoutes.js"
 
 const router = Router()
 
@@ -10,6 +10,6 @@ router.get("/", (_req, res) => {
 })
 
 router.use("/health", healthRoutes)
-router.use("/users", userRoutes)
+router.use("/auth", userRoutes)
 
 export default router

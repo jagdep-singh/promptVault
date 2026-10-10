@@ -4,6 +4,7 @@ import helmet from "helmet"
 import morgan from "morgan"
 
 import apiRouter from "./routes/index.js"
+import errorHandler from "./middleware/errorHandler.js"
 
 const app = express()
 
@@ -12,6 +13,7 @@ app.use(cors())
 app.use(morgan("dev"))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(errorHandler)
 
 app.use("/api", apiRouter)
 
@@ -20,6 +22,14 @@ app.use((req, res) => {
     error: "Not found",
     message: `No route matches ${req.method} ${req.originalUrl}`,
   })
+})
+
+app.get("/", (_req, res) => {
+  res.json({ message: "use /api " })
+})
+
+app.get("/sub", (_req, res) => {
+  res.json({ message: "submission by jagdeep singh" })
 })
 
 export default app
