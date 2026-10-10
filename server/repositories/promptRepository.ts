@@ -25,7 +25,10 @@ export async function findPromptsByUser(
     const query: Record<string, unknown> = {user: userId}
 
     if(filter.tags){
-        query.$text = {$search : filter.search}
+        query.tags = filter.tags
+    }
+    if(filter.search){
+        query.$text = { $search: filter.search }
     }
     return Prompt.find(query).sort({isPinned: -1, updatedAt: -1})
 }
