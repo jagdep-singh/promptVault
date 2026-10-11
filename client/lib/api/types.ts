@@ -1,4 +1,4 @@
-export type PromptTools = "code0" | "chatgpt" | "claude" | "copilot" | "opencode" | "other"
+export type PromptTool = "code0" | "chatgpt" | "claude" | "copilot"| "opencode" | "other"
 
 export interface User{
     id:string
@@ -18,10 +18,10 @@ export interface Prompt{
     title:string
     content:string
     tags:string[]
-    tools:PromptTools
+    tool:PromptTool
     isPinned:boolean
     usedCount:number
-    createAt:string
+    createdAt:string
     updatedAt:string
 }
 
@@ -68,15 +68,15 @@ export interface LoginInput{
 export interface CreatePromptInput{
     title:string
     content:string
-    tags?:string[]
-    tools:PromptTools
+    tag?:string[]
+    tool?:PromptTool
 }
 
 export type UpdatePromptInput = Partial<CreatePromptInput>
 
 export interface ListPromptsParams{
     search?:string
-    tags?:string
+    tag?:string
     sort?:"pinned"|"recent"|"used"
     page?:number
     limit?:number
