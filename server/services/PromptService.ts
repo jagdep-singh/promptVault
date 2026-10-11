@@ -20,39 +20,43 @@ export async function createPromptsforUser(userId: string, input: PromptInput){
     return promptRepo.createPrompt(userId, input)
 }
 
-export async function listPromptsForUser(userId: string, options: ListOptions ={}){ 
-    const page = options.page ?? 1
-    const limit = options.limit ?? 10
 
-    const sortBy = options.sort ?? "pinned"
-    const [data, total] = await Promise.all([
-        promptRepo.findPromptsByUser(userId, options),
-        promptRepo.countPrompts(userId, options)
-    ])
+export const listPromptsForUser = async (
+  userId: string,
+  filter: {
+    search?: string;
+    tags?: string;
+    page?: number;
+    limit?: number;
+    sort?: "pinned" | "recent" | "used";
+  } = {}
+) => {
+  const {
+    page = 1,
+    limit = 10,
+    ...queryFilters
+  } = filter;
 
-    const sortedData = data.sort((x,y) =>{
-        if(sortBy === "used"){
-            return y.usedCount - x.usedCount
-        }
+  const [prompts, total] = await Promise.all([
+    promptRepo.findPromptsByUser(userId, {
+      ...queryFilters,
+      page,
+      limit,
+    }),
+    promptRepo.countPrompts(userId, queryFilters),
+  ]);
 
-        if(sortBy === "recent"){
-            return y.updatedAt.getTime() - x.updatedAt.getTime()
-        }
+  return {
+    prompts,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
 
-        return Number(y.isPinned) - Number(x.isPinned) || 
-               y.updatedAt.getTime() - x.updatedAt.getTime()
-    })
-
-    const start = (page - 1) * limit
-
-    return{
-        data: sortedData.slice(start, start + limit),
-        page,
-        total,
-        limit,
-        totalPages: Math.ceil(total / limit)
-    }
-}
 
 export async function getPromptForUser(userId: string, promptId: string){
     const prompt = await promptRepo.findPromptById(userId, promptId)
