@@ -15,23 +15,49 @@ export async function createPrompt(
     })
 }
 
-export async function findPromptsByUser(
-    userId: string,
-    filter:{
-        search?: string
-        tags?:string
-    } = {}
-){
-    const query: Record<string, unknown> = {user: userId}
+export const findPromptsByUser = async (
+  userId: string,
+  filter: {
+    search?: string;
+    tags?: string;
+    page?: number;
+    limit?: number;
+    sort?: "pinned" | "recent" | "used";
+  } = {}
+) => {
+  const {
+    search,
+    tags,
+    page = 1,
+    limit = 10,
+    sort = "pinned",
+  } = filter;
 
-    if(filter.tags){
-        query.tags = filter.tags
-    }
-    if(filter.search){
-        query.$text = { $search: filter.search }
-    }
-    return Prompt.find(query).sort({isPinned: -1, updatedAt: -1})
-}
+  const query: Record<string, any> = { user: userId };
+
+  if (tags) {
+    query.tags = tags;
+  }
+
+  if (search?.trim()) {
+    query.$text = { $search: search.trim() };
+  }
+
+  const sortOptions: Record<string, 1 | -1> =
+    sort === "recent"
+      ? { updatedAt: -1 }
+      : sort === "used"
+        ? { usedCount: -1, updatedAt: -1 }
+        : { isPinned: -1, updatedAt: -1 };
+
+  const skip = (page - 1) * limit;
+
+  return Prompt.find(query)
+    .sort(sortOptions)
+    .skip(skip)
+    .limit(limit)
+    .exec();
+};
 
 export async function findPromptById(userId: string, promptId: string){
 
@@ -76,27 +102,32 @@ export async function incrementPromptUse(userId:string , promptId:string){
     )
 }
 
-export async function countPrompts(
-    userId:string,
-    filter:{
-        search?: string
-        tags?:string
-    } = {}
-){
-    const query: Record<string, unknown> = {user: userId}
+export const countPrompts = async (
+  userId: string,
+  filter: {
+    search?: string;
+    tags?: string;
+  } = {}
+) => {
+  const { search, tags } = filter;
 
-    if(filter.tags) query.tags = filter.tags
-    if (filter.search) query.$text = {$search: filter.search}
+  const query: Record<string, any> = { user: userId };
 
-    return Prompt.countDocuments(query)
-}
+  if (tags) {
+    query.tags = tags;
+  }
 
-export async function getPromptTags(userId:string){
-    const tags = await Prompt.aggregate([
-        {$match: {user: new mongoose.Types.ObjectId(userId)}},
-        {$unwind: "$tags"},
-        {$group: {_id: "$tags", count: {$sum: 1}}},
-        {$sort: {count: -1, _id: 1}},
-        {$project: {_id: 0, name: "$_id", count: 1}}
-    ])
-}
+  if (search?.trim()) {
+    query.$text = { $search: search.trim() };
+  }
+
+  return Prompt.countDocuments(query).exec();
+};
+
+export const getPromptTags = async (userId: string) => {
+  const tags = await Prompt.distinct("tags", {
+    user: userId,
+  });
+
+  return tags.sort((a, b) => a.localeCompare(b));
+};
