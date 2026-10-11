@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import {AuthProvider} from "@/lib/auth/auth-context"
 
 export const metadata: Metadata = {
   title: "PromptVault",
@@ -17,7 +18,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
 
       <body className="min-h-full flex flex-col">
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
