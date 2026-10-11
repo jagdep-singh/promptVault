@@ -68,7 +68,7 @@ export interface LoginInput{
 export interface CreatePromptInput{
     title:string
     content:string
-    tag?:string[]
+    tags?:string[]
     tool?:PromptTool
 }
 
@@ -76,7 +76,7 @@ export type UpdatePromptInput = Partial<CreatePromptInput>
 
 export interface ListPromptsParams{
     search?:string
-    tag?:string
+    tags?:string
     sort?:"pinned"|"recent"|"used"
     page?:number
     limit?:number

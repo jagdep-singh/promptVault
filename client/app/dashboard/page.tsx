@@ -96,7 +96,7 @@ export default function DashboardPage() {
     try {
       const response = await listPrompts({
         search: search || undefined,
-        tag: selectedTag || undefined,
+        tags: selectedTag || undefined,
         sort,
         page,
       });
