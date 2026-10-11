@@ -145,7 +145,7 @@ function EditPromptPageContent() {
       <main className="mx-auto min-h-screen max-w-3xl space-y-6 px-5 py-10">
         <Skeleton className="h-5 w-36" />
         <Skeleton className="h-12 w-2/3" />
-        <Skeleton className="h-[500px] w-full rounded-xl" />
+        <Skeleton className="h-125 w-full rounded-xl" />
       </main>
     );
   }
@@ -345,7 +345,7 @@ function EditPromptPageFallback() {
     <main className="mx-auto min-h-screen max-w-3xl space-y-6 px-5 py-10">
       <Skeleton className="h-5 w-36" />
       <Skeleton className="h-12 w-2/3" />
-      <Skeleton className="h-[500px] w-full rounded-xl" />
+      <Skeleton className="h-125 w-full rounded-xl" />
     </main>
   );
 }

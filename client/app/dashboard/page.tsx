@@ -477,7 +477,7 @@ async function handleDelete() {
                 </CardHeader>
 
                 <CardContent className="flex-1 pb-4">
-                  <p className="line-clamp-5 whitespace-pre-wrap break-words text-sm leading-6 text-muted-foreground">
+                  <p className="line-clamp-5 whitespace-pre-wrap wrap-break-words text-sm leading-6 text-muted-foreground">
                     {prompt.content}
                   </p>
 
