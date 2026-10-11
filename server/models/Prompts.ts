@@ -6,6 +6,7 @@ export const TOOLS = [
     "chatgpt",
     "claude",
     "copilot",
+    "opencode",
     "other",
 ] as const
 
