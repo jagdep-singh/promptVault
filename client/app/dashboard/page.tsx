@@ -35,6 +35,17 @@ import {
   AlertTitle,
 } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 import {
   Search,
@@ -44,7 +55,6 @@ import {
   Pencil,
   Trash2,
   LogOut,
-  Sparkles,
   RefreshCw,
   ChevronLeft,
   ChevronRight,
@@ -71,8 +81,7 @@ export default function DashboardPage() {
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [selectedTag, setSelectedTag] = useState("");
-  const [sort, setSort] =
-    useState<NonNullable<ListPromptsParams["sort"]>>("recent");
+  const [sort, setSort] = useState<NonNullable<ListPromptsParams["sort"]>>("recent");
   const [page, setPage] = useState(1);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -80,6 +89,7 @@ export default function DashboardPage() {
   const [actionError, setActionError] = useState("");
   const [notice, setNotice] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [promptToDelete, setPromptToDelete] = useState<Prompt | null>(null);
 
   useEffect(() => {
     if (!isAuthLoading && !user) {
@@ -113,7 +123,13 @@ export default function DashboardPage() {
   }, [user, search, selectedTag, sort, page]);
 
   useEffect(() => {
-    if (user) void loadPrompts();
+    if (!user) return;
+
+    const timeoutId = window.setTimeout(() => {
+      void loadPrompts();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [user, loadPrompts]);
 
   useEffect(() => {
@@ -173,37 +189,34 @@ export default function DashboardPage() {
     }
   }
 
-  async function handleDelete(prompt: Prompt) {
-    if (
-      !window.confirm(
-        `Delete "${prompt.title}"? This action cannot be undone.`,
-      )
-    ) {
-      return;
+async function handleDelete() {
+  if (!promptToDelete) return;
+
+  const prompt = promptToDelete;
+
+  setBusyId(prompt.id);
+  setActionError("");
+  setNotice("");
+
+  try {
+    await deletePrompt(prompt.id);
+    setPromptToDelete(null);
+
+    if (prompts.length === 1 && page > 1) {
+      setPage((current) => current - 1);
+    } else {
+      await loadPrompts();
     }
 
-    setBusyId(prompt.id);
-    setActionError("");
-    setNotice("");
-
-    try {
-      await deletePrompt(prompt.id);
-
-      if (prompts.length === 1 && page > 1) {
-        setPage((current) => current - 1);
-      } else {
-        await loadPrompts();
-      }
-
-      setNotice("Prompt deleted.");
-    } catch (err) {
-      setActionError(
-        err instanceof Error ? err.message : "Unable to delete this prompt.",
-      );
-    } finally {
-      setBusyId(null);
-    }
+    setNotice("Prompt deleted.");
+  } catch (err) {
+    setActionError(
+      err instanceof Error ? err.message : "Unable to delete this prompt.",
+    );
+  } finally {
+    setBusyId(null);
   }
+}
 
   function handleLogout() {
     logout();
@@ -517,16 +530,54 @@ export default function DashboardPage() {
                     Edit
                   </Button>
 
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    disabled={busyId === prompt.id}
-                    onClick={() => void handleDelete(prompt)}
-                    aria-label="Delete prompt"
-                    title="Delete prompt"
+                  <AlertDialog
+                    open={promptToDelete?.id === prompt.id}
+                    onOpenChange={(open) => {
+                      if (!open && busyId !== prompt.id) {
+                        setPromptToDelete(null);
+                      }
+                    }}
                   >
-                    <Trash2 className="size-4 text-destructive" />
-                  </Button>
+                    <AlertDialogTrigger
+                      render={
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          disabled={busyId === prompt.id}
+                          aria-label="Delete prompt"
+                          title="Delete prompt"
+                          onClick={() => setPromptToDelete(prompt)}
+                        >
+                          <Trash2 className="size-4 text-destructive" />
+                        </Button>
+                      }
+                    />
+
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete this prompt?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {`"${prompt.title}" will be permanently deleted. This action cannot be undone.`}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+
+                      <AlertDialogFooter>
+                        <AlertDialogCancel disabled={busyId === prompt.id}>
+                          Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          disabled={busyId === prompt.id}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            void handleDelete();
+                          }}
+                          className="bg-destructive text-white hover:bg-destructive/90"
+                        >
+                          {busyId === prompt.id ? "Deleting..." : "Delete"}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </CardFooter>
               </Card>
             ))}
