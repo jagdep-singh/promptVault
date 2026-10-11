@@ -486,18 +486,6 @@ Code0's terminal was used for Git and GitHub operations, including pushing and p
 
 Code0's AI-assisted features were not used because AI credits were unavailable during development. This README does not attribute implementation or debugging tasks to Code0's AI assistant.
 
-### AI-assisted development
-
-Where applicable, external AI assistance was used as a development aid for reviewing the frontend/API integration, examining project structure, preparing technical documentation, and planning deployment checks. Suggestions were evaluated against the existing code and project requirements rather than accepted automatically.
-
-The final implementation and verification remain the developer's responsibility.
-
-## Project Scope
-
-This version provides authentication, prompt CRUD operations, tags, search, sorting, pagination, pinning, usage tracking, and clipboard copying.
-
-**Dynamic template variables and a live-preview editor for placeholders such as `{{language}}` are not implemented in this version.** They can be added as a future enhancement without representing them as an existing capability.
-
 ---
 
 ## License
